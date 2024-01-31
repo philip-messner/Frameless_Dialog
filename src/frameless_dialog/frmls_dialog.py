@@ -1,23 +1,33 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import os
-from enum import Enum, auto
+import enum
 
 from frameless_dialog import frmls_resources
 
 PIXELS_TO_ACT = 7
 
 
-class TitleMode(Enum):
+class TitleMode(enum.Enum):
 
     CLEAN_TITLE = 0
-    ONLY_CLOSE_BTN = auto()
-    MENU_OFF = auto()
-    MAX_MIN_OFF = auto()
-    FULL_SCREEN_MODE = auto()
-    MAX_MODE_OFF = auto()
-    MIN_MODE_OFF = auto()
-    FULL_TITLE = auto()
-    NO_TITLE = auto()
+    ONLY_CLOSE_BTN = 1
+    MENU_OFF = 2
+    MAX_MIN_OFF = 3
+    FULL_SCREEN_MODE = 4
+    MAX_MODE_OFF = 5
+    MIN_MODE_OFF = 6
+    FULL_TITLE = 7
+    NO_TITLE = 8
+
+
+class DialogTheme(enum.StrEnum):
+
+    DARK = ':/dark/stylesheet.qss'
+    DARK_GREEN = ':/dark-green/stylesheet.qss'
+    DARK_PURPLE = ':/dark-purple/stylesheet.qss'
+    LIGHT = ':/light/stylesheet.qss'
+    LIGHT_GREEN = ':/light-green/stylesheet.qss'
+    LIGHT_PURPLE = ':/light-purple/stylesheet.qss'
 
 
 class FramelessDialog(QtWidgets.QDialog):
@@ -47,6 +57,8 @@ class FramelessDialog(QtWidgets.QDialog):
         self.pbClose.clicked.connect(self.close)
 
         self.title_mode: TitleMode = TitleMode.FULL_TITLE
+        self.current_theme: DialogTheme = None
+        self.set_theme(DialogTheme.DARK)
         self.pbRestore.setVisible(False)
         self.old_geometry = self.geometry()
 
@@ -70,6 +82,27 @@ class FramelessDialog(QtWidgets.QDialog):
         self.cent_widget.destroyed.connect(self.close)
 
         self.layout_central_widget.addWidget(self.cent_widget)
+
+    def set_tbMenu_icon(self, file_path: str):
+
+        try:
+            self.tb_menu.setIcon(QtGui.QIcon(file_path))
+        except FileNotFoundError:
+            pass
+
+    def set_theme(self, theme: DialogTheme):
+        if theme == self.current_theme:
+            return
+
+        # qt_app = QtWidgets.QApplication.instance()
+
+        stylesheet_file = QtCore.QFile(theme)
+        stylesheet_file.open(QtCore.QFile.OpenModeFlag.ReadOnly | QtCore.QFile.OpenModeFlag.Text)
+        txt_stream = QtCore.QTextStream(stylesheet_file)
+        self.setStyleSheet(txt_stream.readAll())
+        # qt_app.setStyleSheet(txt_stream.readAll())
+
+        self.current_theme = theme
 
     def set_titlebar_mode(self, flag: TitleMode):
         self.title_mode = flag
@@ -343,7 +376,7 @@ class FramelessDialog(QtWidgets.QDialog):
 
         if xPos < tbMenuGeo.right() and yPos < tbMenuGeo.bottom() and xPos >= tbMenuGeo.x() and yPos >= tbMenuGeo.y() and self.tb_menu.isVisible():
             self.close()
-        elif self.title_mode != TitleMode.FullScreenMode and xPos < titleBarGeo.width() and yPos < titleBarGeo.height():
+        elif self.title_mode != TitleMode.FULL_SCREEN_MODE and xPos < titleBarGeo.width() and yPos < titleBarGeo.height():
             self.maximize_restore_BtnClicked()
 
         a0.accept()
@@ -468,7 +501,6 @@ class FramelessDialog(QtWidgets.QDialog):
         else:
             self.resize(xMouse + 1, yMouse + 1)
 
-
     def maximize_restore_BtnClicked(self):
 
         if self.isFullScreen() or self.isMaximized():
@@ -490,13 +522,7 @@ class FramelessDialog(QtWidgets.QDialog):
         else:
             self.setWindowState(self.windowState() | QtCore.Qt.WindowState.WindowMinimized)
 
-    def set_tbMenu_icon(self, file_path: str):
 
-        try:
-            self.tb_menu.setIcon(QtGui.QIcon(file_path))
-        except FileNotFoundError:
-            # Handle the exception if the file does not exist
-            pass
 
 
 if __name__ == "__main__":
@@ -504,12 +530,6 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
 
-    file = QtCore.QFile(":/dark/stylesheet.qss")
-    file.open(QtCore.QFile.OpenModeFlag.ReadOnly | QtCore.QFile.OpenModeFlag.Text)
-    stream = QtCore.QTextStream(file)
-    app.setStyleSheet(stream.readAll())
-
-    # print(qt_material.list_themes())
     win = FramelessDialog()
     win.setWindowTitle('Test')
     win.show()

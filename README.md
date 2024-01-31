@@ -23,7 +23,10 @@ This frameless QDialog widget can be used as a direct replacement for the standa
 Philip Messner [rxphil35@gmail.com](mailto:rxphil35@gmail.com)
 
 
-## Version History
+## Version History (see changelog for more detail)
+
+* 0.2
+  * (added) Defined themes to style the objects inside the dialog 
 
 * 0.1
     * Initial Release
