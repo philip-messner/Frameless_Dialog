@@ -2,7 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import os
 from enum import Enum, auto
 
-import frmls_resources
+from frameless_dialog import frmls_resources
 
 PIXELS_TO_ACT = 7
 
