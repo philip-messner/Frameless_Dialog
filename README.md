@@ -15,23 +15,8 @@ This frameless QDialog widget can be used as a direct replacement for the standa
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+* pip install frameless_dialog
 
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
 
 ## Authors
 
